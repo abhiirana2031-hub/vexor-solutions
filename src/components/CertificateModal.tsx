@@ -146,9 +146,14 @@ export const CertificateModal: React.FC<
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-6 transition-colors">
-        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
+      <div className="w-full max-w-3xl bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-0 sm:my-6 transition-colors animate-in slide-in-from-bottom duration-300">
+        {/* Mobile Drag Pill */}
+        <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
+          <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
             <Award className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             <span className="font-semibold">Official Certificate of Completion</span>
@@ -156,13 +161,14 @@ export const CertificateModal: React.FC<
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Close Certificate Modal"
+            className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-4 sm:p-6">
+        <div className="p-3 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
           <CertificateCanvas
             progress={progress}
             activeCourseId={activeCourseId}

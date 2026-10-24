@@ -472,11 +472,11 @@ export const SandboxPlayground: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
-            <Terminal className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
-            <span>Multi-Language Interactive Code Sandbox</span>
+          <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+            <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span>Interactive Code Sandbox</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
             Experiment freely with C++, Python, DSA algorithms, JavaScript, TypeScript, SQL, and Bash script runners right in your browser.
@@ -484,13 +484,13 @@ export const SandboxPlayground: React.FC = () => {
         </div>
 
         {/* Category Pills & Preset Selector */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-semibold">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-xs font-semibold overflow-x-auto no-scrollbar py-1">
             {(['All', 'Full Stack Web Dev', 'Python', 'C++ Systems', 'DSA Mastery'] as const).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap min-h-[36px] flex items-center ${
                   activeCategory === cat
                     ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -507,7 +507,7 @@ export const SandboxPlayground: React.FC = () => {
               const found = PRESET_PROGRAMS.find((p) => p.id === e.target.value);
               if (found) setSelectedPreset(found);
             }}
-            className="px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm"
+            className="w-full sm:w-auto px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm min-h-[44px]"
           >
             {filteredPresets.map((p) => (
               <option key={p.id} value={p.id}>

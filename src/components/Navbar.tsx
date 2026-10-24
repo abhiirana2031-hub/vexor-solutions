@@ -29,6 +29,7 @@ interface NavbarProps {
   devMode: boolean;
   setDevMode: (val: boolean) => void;
   onOpenCertificate: () => void;
+  onOpenMobileSyllabus?: () => void;
 }
 
 const getCourseVisuals = (id: CourseId) => {
@@ -79,6 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   devMode,
   setDevMode,
   onOpenCertificate,
+  onOpenMobileSyllabus,
 }) => {
   const currentCourse = COURSES[activeCourseId];
   const stats = calculateProgressStats(progress);
@@ -86,173 +88,248 @@ export const Navbar: React.FC<NavbarProps> = ({
   const activeVisuals = getCourseVisuals(activeCourseId);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 py-3">
-        {/* Zone 1: Course Brand & Selector */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <button
-              onClick={() => setCourseDropdownOpen(!courseDropdownOpen)}
-              className="flex items-center gap-2.5 text-left group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1 -m-1"
-              title="Click to switch courses"
-            >
-              <div
-                className={`w-9 h-9 rounded-lg flex items-center justify-center text-white shadow-sm ${activeVisuals.gradient}`}
+    <>
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 py-2.5 sm:py-3">
+          {/* Zone 1: Course Brand & Selector */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="relative">
+              <button
+                onClick={() => setCourseDropdownOpen(!courseDropdownOpen)}
+                className="flex items-center gap-2 text-left group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1 -m-1 min-h-[44px]"
+                title="Click to switch courses"
               >
-                {activeVisuals.icon}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
-                    {currentCourse.shortTitle}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
+                <div
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm ${activeVisuals.gradient}`}
+                >
+                  {activeVisuals.icon}
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:block">
-                  4 Weeks · 28 Days · {activeVisuals.topicsCount}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">
+                      {currentCourse.shortTitle}
+                    </span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0 transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:block">
+                    4 Weeks · 28 Days · {activeVisuals.topicsCount}
+                  </div>
                 </div>
-              </div>
+              </button>
+
+              {/* Course Switcher Dropdown Menu */}
+              {courseDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-20"
+                    onClick={() => setCourseDropdownOpen(false)}
+                  />
+                  <div className="absolute left-0 top-full mt-2 w-72 sm:w-80 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-30 space-y-1">
+                    <div className="px-2 py-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono">
+                      Select Academy Course
+                    </div>
+                    {COURSE_LIST.map((c) => {
+                      const isSelected = c.id === activeCourseId;
+                      const visuals = getCourseVisuals(c.id);
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => {
+                            onSelectCourse(c.id);
+                            setCourseDropdownOpen(false);
+                          }}
+                          className={`w-full p-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center gap-3 min-h-[44px] ${
+                            isSelected
+                              ? 'bg-indigo-50 dark:bg-slate-800 text-indigo-900 dark:text-white border border-indigo-200 dark:border-indigo-900/60'
+                              : 'hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0 ${visuals.bg}`}
+                          >
+                            {visuals.smallIcon}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                              <span className="truncate">{c.title}</span>
+                              {isSelected && (
+                                <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono shrink-0 ml-1">Active</span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                              {c.badge}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Zone 2: Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <button
+              onClick={() => setActiveTab('curriculum')}
+              className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+                activeTab === 'curriculum'
+                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
+                  : 'hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Curriculum
+            </button>
+            <button
+              onClick={() => setActiveTab('sandbox')}
+              className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+                activeTab === 'sandbox'
+                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
+                  : 'hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Code Sandbox
+            </button>
+            <button
+              onClick={() => setActiveTab('stats')}
+              className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+                activeTab === 'stats'
+                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
+                  : 'hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Progress ({stats.overallPercentage}%)
+            </button>
+            <button
+              onClick={() => setActiveTab('certificate')}
+              className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 flex items-center gap-1.5 ${
+                activeTab === 'certificate'
+                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
+                  : 'hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Award className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+              <span>Certificate</span>
+            </button>
+          </nav>
+
+          {/* Zone 3: Theme Toggle & Dev Mode */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Theme Toggle (Light / Dark) */}
+            <button
+              onClick={onToggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold min-h-[44px] min-w-[44px] justify-center"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span className="hidden lg:inline">Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-indigo-600" />
+                  <span className="hidden lg:inline">Dark Mode</span>
+                </>
+              )}
             </button>
 
-            {/* Course Switcher Dropdown Menu */}
-            {courseDropdownOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setCourseDropdownOpen(false)}
-                />
-                <div className="absolute left-0 top-full mt-2 w-72 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2 z-20 space-y-1">
-                  <div className="px-2 py-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono">
-                    Select Academy Course
-                  </div>
-                  {COURSE_LIST.map((c) => {
-                    const isSelected = c.id === activeCourseId;
-                    const visuals = getCourseVisuals(c.id);
-                    return (
-                      <button
-                        key={c.id}
-                        onClick={() => {
-                          onSelectCourse(c.id);
-                          setCourseDropdownOpen(false);
-                        }}
-                        className={`w-full p-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center gap-3 ${
-                          isSelected
-                            ? 'bg-indigo-50 dark:bg-slate-800 text-indigo-900 dark:text-white border border-indigo-200 dark:border-indigo-900/60'
-                            : 'hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        <div
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0 ${visuals.bg}`}
-                        >
-                          {visuals.smallIcon}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                            <span>{c.title}</span>
-                            {isSelected && (
-                              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono">Active</span>
-                            )}
-                          </div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                            {c.badge}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+            {/* Dev Mode Unlock Toggle */}
+            <button
+              onClick={() => setDevMode(!devMode)}
+              aria-label="Toggle Dev Unlock Mode"
+              title="Toggle Dev Unlock Mode (unlocks all modules for preview and evaluation)"
+              className={`flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 min-h-[44px] ${
+                devMode
+                  ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {devMode ? (
+                <Unlock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              ) : (
+                <Lock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+              )}
+              <span className="hidden lg:inline">{devMode ? 'Dev: Unlocked' : 'Progression'}</span>
+            </button>
           </div>
         </div>
+      </header>
 
-        {/* Zone 2: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+      {/* Mobile-First Fixed Bottom Navigation Bar (Natural Thumb Zone) */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 shadow-lg px-2"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
+      >
+        <div className="grid grid-cols-5 items-center h-16">
           <button
             onClick={() => setActiveTab('curriculum')}
-            className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+            className={`flex flex-col items-center justify-center h-full transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'curriculum'
-                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
-                : 'hover:text-slate-900 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Curriculum
+            <BookOpen className="w-5 h-5" />
+            <span className="text-[10px] mt-1 font-medium tracking-tight">Lesson</span>
           </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('curriculum');
+              if (onOpenMobileSyllabus) {
+                onOpenMobileSyllabus();
+              }
+            }}
+            className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer min-h-[44px]"
+          >
+            <Layers className="w-5 h-5 text-indigo-500" />
+            <span className="text-[10px] mt-1 font-medium tracking-tight">28 Days</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('sandbox')}
-            className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+            className={`flex flex-col items-center justify-center h-full transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'sandbox'
-                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
-                : 'hover:text-slate-900 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Code Sandbox
+            <Terminal className="w-5 h-5" />
+            <span className="text-[10px] mt-1 font-medium tracking-tight">Sandbox</span>
           </button>
+
           <button
             onClick={() => setActiveTab('stats')}
-            className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 ${
+            className={`flex flex-col items-center justify-center h-full transition-colors cursor-pointer min-h-[44px] ${
               activeTab === 'stats'
-                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
-                : 'hover:text-slate-900 dark:hover:text-white'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Progress ({stats.overallPercentage}%)
-          </button>
-          <button
-            onClick={() => setActiveTab('certificate')}
-            className={`whitespace-nowrap shrink-0 transition-colors cursor-pointer py-1 flex items-center gap-1.5 ${
-              activeTab === 'certificate'
-                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-500 font-semibold'
-                : 'hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Award className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-            <span>Certificate</span>
-          </button>
-        </nav>
-
-        {/* Zone 3: Theme Toggle & Dev Mode */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Theme Toggle (Light / Dark) */}
-          <button
-            onClick={onToggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
-          >
-            {theme === 'dark' ? (
-              <>
-                <Sun className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Light Mode</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-4 h-4 text-indigo-600" />
-                <span className="hidden sm:inline">Dark Mode</span>
-              </>
-            )}
+            <div className="relative">
+              <Award className="w-5 h-5" />
+              {stats.overallPercentage > 0 && (
+                <span className="absolute -top-1 -right-2 text-[9px] font-mono bg-indigo-600 text-white rounded-full px-1 leading-tight">
+                  {stats.overallPercentage}%
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] mt-1 font-medium tracking-tight">Progress</span>
           </button>
 
-          {/* Dev Mode Unlock Toggle */}
           <button
-            onClick={() => setDevMode(!devMode)}
-            aria-label="Toggle Dev Unlock Mode"
-            title="Toggle Dev Unlock Mode (unlocks all modules for preview and evaluation)"
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-              devMode
-                ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
+            onClick={onOpenCertificate}
+            className="flex flex-col items-center justify-center h-full text-amber-600 dark:text-amber-400 hover:text-amber-500 transition-colors cursor-pointer min-h-[44px]"
           >
-            {devMode ? (
-              <Unlock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            ) : (
-              <Lock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            )}
-            <span className="hidden sm:inline">{devMode ? 'Dev: All Unlocked' : 'Progression Mode'}</span>
+            <Award className="w-5 h-5" />
+            <span className="text-[10px] mt-1 font-medium tracking-tight">Certificate</span>
           </button>
         </div>
-      </div>
-    </header>
+      </nav>
+    </>
   );
 };

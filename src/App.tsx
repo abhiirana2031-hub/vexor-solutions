@@ -314,6 +314,9 @@ export default function App() {
     }));
   };
 
+  // Mobile Syllabus Drawer State
+  const [isMobileSyllabusOpen, setIsMobileSyllabusOpen] = useState(false);
+
   // Find the quiz for active modal
   const currentQuizModule = activeQuizWeek
     ? courseModules.find((m) => m.weekNumber === activeQuizWeek)
@@ -321,7 +324,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* 1. Global Navigation Bar */}
+      {/* 1. Global Navigation Bar (Includes Mobile Fixed Bottom Tab Bar) */}
       <Navbar
         activeCourseId={activeCourseId}
         onSelectCourse={(courseId) => {
@@ -336,6 +339,7 @@ export default function App() {
         devMode={devMode}
         setDevMode={setDevMode}
         onOpenCertificate={() => setIsCertificateOpen(true)}
+        onOpenMobileSyllabus={() => setIsMobileSyllabusOpen(true)}
       />
 
       {/* Unlock Notification Toast */}
@@ -348,8 +352,8 @@ export default function App() {
         </div>
       )}
 
-      {/* 2. Main Viewport Router */}
-      <main className="flex-1">
+      {/* 2. Main Viewport Router (pb-24 on mobile ensures clearance for fixed bottom tab bar) */}
+      <main className="flex-1 pb-24 md:pb-8">
         {activeTab === 'curriculum' && (
           <div>
             {/* Hero Section */}
@@ -365,7 +369,7 @@ export default function App() {
               }}
             />
 
-            {/* Split Layout: Sidebar + Lesson Viewer */}
+            {/* Split Layout: Desktop Sidebar + Lesson Viewer */}
             <div
               id="lesson-content-area"
               className="max-w-7xl mx-auto flex flex-col lg:flex-row items-stretch"
@@ -393,6 +397,7 @@ export default function App() {
                   hasPrevDay={hasPrevDay}
                   hasNextDay={hasNextDay}
                   onOpenQuiz={(weekNumber) => setActiveQuizWeek(weekNumber)}
+                  onOpenMobileSyllabus={() => setIsMobileSyllabusOpen(true)}
                 />
               </div>
             </div>
@@ -437,7 +442,27 @@ export default function App() {
         )}
       </main>
 
-      {/* 3. Global Modals */}
+      {/* 3. Global Modals & Mobile Drawer */}
+      {isMobileSyllabusOpen && (
+        <SyllabusSidebar
+          modules={courseModules}
+          progress={currentProgress}
+          activeDayId={activeDayId}
+          onSelectDay={(dayId) => {
+            setActiveDayId(dayId);
+            setIsMobileSyllabusOpen(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenQuiz={(weekNumber) => {
+            setActiveQuizWeek(weekNumber);
+            setIsMobileSyllabusOpen(false);
+          }}
+          devMode={devMode}
+          isMobileDrawer={true}
+          onCloseMobileDrawer={() => setIsMobileSyllabusOpen(false)}
+        />
+      )}
+
       {currentQuizModule && (
         <QuizModal
           quiz={currentQuizModule.quiz}

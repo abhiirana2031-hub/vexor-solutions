@@ -30,6 +30,7 @@ interface LessonViewerProps {
   hasPrevDay: boolean;
   hasNextDay: boolean;
   onOpenQuiz: (weekNumber: number) => void;
+  onOpenMobileSyllabus?: () => void;
 }
 
 export const LessonViewer: React.FC<LessonViewerProps> = ({
@@ -42,6 +43,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   hasPrevDay,
   hasNextDay,
   onOpenQuiz,
+  onOpenMobileSyllabus,
 }) => {
   const topics: SubTopic[] = lesson.topics && lesson.topics.length > 0 ? lesson.topics : [];
   const [activeTopicIdx, setActiveTopicIdx] = useState(0);
@@ -88,7 +90,28 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
   };
 
   return (
-    <article className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 text-slate-900 dark:text-slate-100 transition-colors">
+    <article className="flex-1 max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-8 sm:space-y-10 text-slate-900 dark:text-slate-100 transition-colors">
+      {/* Mobile-Only Syllabus Quick Jump Header */}
+      <div className="lg:hidden flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="min-w-0 pr-2">
+          <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 font-mono uppercase truncate">
+            Week {lesson.weekNumber} · Day {lesson.dayNumber} of 28
+          </div>
+          <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+            {lesson.title}
+          </div>
+        </div>
+        {onOpenMobileSyllabus && (
+          <button
+            onClick={onOpenMobileSyllabus}
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors shrink-0 min-h-[44px] cursor-pointer"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Browse 28 Days</span>
+          </button>
+        )}
+      </div>
+
       {/* 1. Lesson Header */}
       <header className="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         {/* Unboxed Metadata Kicker */}
@@ -150,42 +173,84 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       {topics.length > 0 && (
         <section className="space-y-6 pt-2">
           {/* Topic Navigation Bar Header */}
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-indigo-900/40 shadow-xs space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-indigo-900/40 shadow-xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-wide uppercase font-mono">
+                <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white tracking-wide uppercase font-mono">
                   Day {lesson.dayNumber} Curriculum: {topics.length} In-Depth Topics
                 </h2>
               </div>
 
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-1 bg-white dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
-                <button
-                  onClick={() => setViewMode('focused')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                    viewMode === 'focused'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Step-by-Step (Topic {activeTopicIdx + 1}/{topics.length})
-                </button>
-                <button
-                  onClick={() => setViewMode('all')}
-                  className={`px-3 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                    viewMode === 'all'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  View All {topics.length} Topics
-                </button>
+              {/* View Mode & Topic Prev/Next controls */}
+              <div className="flex items-center justify-between sm:justify-end gap-2">
+                <div className="flex items-center gap-1 bg-white dark:bg-slate-950 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+                  <button
+                    onClick={() => setViewMode('focused')}
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer min-h-[36px] sm:min-h-0 flex items-center ${
+                      viewMode === 'focused'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Topic {activeTopicIdx + 1}/{topics.length}
+                  </button>
+                  <button
+                    onClick={() => setViewMode('all')}
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer min-h-[36px] sm:min-h-0 flex items-center ${
+                      viewMode === 'all'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    All {topics.length}
+                  </button>
+                </div>
+
+                {/* Quick Prev / Next Topic Buttons */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      if (activeTopicIdx > 0) {
+                        const newIdx = activeTopicIdx - 1;
+                        setActiveTopicIdx(newIdx);
+                        setViewMode('focused');
+                        if (topics[newIdx]) {
+                          setRunnerCode(topics[newIdx].codeSnippet.code);
+                          setRunnerLanguage(topics[newIdx].codeSnippet.language);
+                        }
+                      }
+                    }}
+                    disabled={activeTopicIdx === 0}
+                    aria-label="Previous Topic"
+                    className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (activeTopicIdx < topics.length - 1) {
+                        const newIdx = activeTopicIdx + 1;
+                        setActiveTopicIdx(newIdx);
+                        setViewMode('focused');
+                        if (topics[newIdx]) {
+                          setRunnerCode(topics[newIdx].codeSnippet.code);
+                          setRunnerLanguage(topics[newIdx].codeSnippet.language);
+                        }
+                      }
+                    }}
+                    disabled={activeTopicIdx >= topics.length - 1}
+                    aria-label="Next Topic"
+                    className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Stepper Tabs */}
-            <div className={`grid grid-cols-2 sm:grid-cols-4 ${topics.length >= 8 ? 'md:grid-cols-8' : 'md:grid-cols-7'} gap-1.5 pt-1`}>
+            {/* Stepper Tabs - Mobile Horizontal Touch Carousel & Desktop Grid */}
+            <div className="flex overflow-x-auto no-scrollbar gap-2 py-1 scroll-smooth snap-x sm:grid sm:grid-cols-4 md:grid-cols-8">
               {topics.map((t, idx) => {
                 const isActive = activeTopicIdx === idx;
                 return (
@@ -197,9 +262,9 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
                       setRunnerCode(t.codeSnippet.code);
                       setRunnerLanguage(t.codeSnippet.language);
                     }}
-                    className={`p-2 rounded-lg text-left transition-all cursor-pointer border ${
+                    className={`min-w-[130px] sm:min-w-0 min-h-[48px] shrink-0 sm:shrink snap-start p-2.5 rounded-xl text-left transition-all cursor-pointer border ${
                       isActive
-                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm'
+                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm ring-2 ring-indigo-400/40'
                         : 'bg-white dark:bg-slate-950/70 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900'
                     }`}
                   >
@@ -564,47 +629,45 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({
       )}
 
       {/* 8. Bottom Navigation Controls */}
-      <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <button
-            onClick={() => onToggleComplete(lesson.dayNumber)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              isCompleted
-                ? 'bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            <CheckCircle className={`w-4 h-4 ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
-            <span>{isCompleted ? 'Day Completed (Click to Toggle)' : 'Mark Day as Completed'}</span>
-          </button>
-        </div>
+      <footer className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <button
+          onClick={() => onToggleComplete(lesson.dayNumber)}
+          className={`w-full sm:w-auto min-h-[48px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+            isCompleted
+              ? 'bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          <CheckCircle className={`w-4 h-4 ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
+          <span>{isCompleted ? 'Day Completed (Click to Toggle)' : 'Mark Day as Completed'}</span>
+        </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {hasPrevDay && (
             <button
               onClick={onPrevDay}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[48px] flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Previous Day</span>
+              <span>Prev Day</span>
             </button>
           )}
 
           {lesson.dayNumber % 7 === 0 ? (
             <button
               onClick={() => onOpenQuiz(lesson.weekNumber)}
-              className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg transition-all shadow-md shadow-amber-400/20 cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[48px] flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-xl transition-all shadow-md shadow-amber-400/20 cursor-pointer"
             >
               <Award className="w-4 h-4 text-slate-950" />
               <span>
-                {lesson.dayNumber === 28 ? 'Take Final Certification Exam' : `Take Week ${lesson.weekNumber} Unlock Quiz`}
+                {lesson.dayNumber === 28 ? 'Take Final Certification Exam' : `Week ${lesson.weekNumber} Unlock Quiz`}
               </span>
             </button>
           ) : (
             hasNextDay && (
               <button
                 onClick={onNextDay}
-                className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors cursor-pointer shadow-sm shadow-indigo-600/30"
+                className="flex-1 sm:flex-initial min-h-[48px] flex items-center justify-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors cursor-pointer shadow-sm shadow-indigo-600/30"
               >
                 <span>Next Day</span>
                 <ArrowRight className="w-3.5 h-3.5" />

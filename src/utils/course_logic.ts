@@ -427,6 +427,34 @@ export function executePythonSnippet(code: string): ExecutionResult {
       True: true,
       False: false,
       None: null,
+      platform: {
+        python_implementation: () => 'CPython',
+        python_version: () => '3.12.2',
+        system: () => 'Linux',
+        machine: () => 'x86_64',
+      },
+      sys: {
+        byteorder: 'little',
+        version: '3.12.2 (main, Oct 2024)',
+        getsizeof: (obj: any) => (typeof obj === 'number' ? 28 : typeof obj === 'string' ? 49 + obj.length : 56),
+      },
+      collections: {
+        deque: (init?: any) => {
+          const arr = Array.isArray(init) ? [...init] : [];
+          (arr as any).append = function(x: any) { this.push(x); };
+          (arr as any).appendleft = function(x: any) { this.unshift(x); };
+          (arr as any).popleft = function() { return this.shift(); };
+          return arr;
+        },
+      },
+      math: {
+        sqrt: Math.sqrt,
+        pow: Math.pow,
+        pi: Math.PI,
+        e: Math.E,
+        floor: Math.floor,
+        ceil: Math.ceil,
+      },
     };
 
     // Transform Python syntax constructs to JS executable code for educational demonstration
